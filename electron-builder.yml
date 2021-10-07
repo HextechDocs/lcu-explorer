@@ -1,0 +1,12 @@
+appId: me.hiray.nextron
+productName: Nextron Example app
+copyright: Copyright © 2020 Ray
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: null

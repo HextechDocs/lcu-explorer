@@ -1,0 +1,9 @@
+node_modules
+*.log
+.next
+app
+dist
+renderer/.next
+.idea
+.vscode
+.yarn
