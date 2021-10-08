@@ -29,4 +29,4 @@ then
 yarn dev
 ```
 ## Credits
-### **Massive thank you to [Mingwei Samuel](https:)** for his work on this app and the backend driving it
+### **Massive thank you to [Mingwei Samuel](https://github.com/MingweiSamuel)** for his work on this app and the backend driving it
