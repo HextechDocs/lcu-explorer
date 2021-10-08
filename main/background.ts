@@ -19,6 +19,16 @@ if (isProd) {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
+app.on('certificate-error', (event, _webContents, _url, _error, certificate, callback) => {
+  if ('sha256/TQ1pFVrt3Msu+IVgubjrrixp75XCuDFovDbcTcqTJjw=' === certificate.fingerprint) {
+    event.preventDefault();
+    callback(true);
+  }
+  else {
+    callback(false);
+  }
+});
+
 (async () => {
   connector.start();
   await app.whenReady();
@@ -76,7 +86,7 @@ connector.on("disconnect", () => {
 ipc.on("fe-ready", (event, args) => {
   console.log("FE READY");
   if (credentials) {
-    console.log(`PASSING CREDENTIALS${credentials}`);
+    console.log(`PASSING CREDENTIALS ${JSON.stringify(credentials)}`);
     event.reply("credentialspass", credentials);
   }
 });

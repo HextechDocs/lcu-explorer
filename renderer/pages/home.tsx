@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { ipcRenderer } from "electron";
 import Swagger from "swagger-ui";
-import axios from "axios";
-import { Agent } from "https";
+import axios, { AxiosResponse } from "axios";
 
 import Titlebar from "@components/Titlebar";
-import { btoa } from "buffer";
 
-const reAgent = new Agent({
-  rejectUnauthorized: false,
-});
+const BASIC_AUTH = 'BasicAuth';
 
 const Home = (): JSX.Element => {
-  const [credentials, SetCredentials] = useState();
+  const [credentials, SetCredentials] = useState<{
+    address: string,
+    port: number,
+    username: string,
+    password: string,
+    protocol: string
+  }>();
   useEffect(() => {
     ipcRenderer.send("fe-ready");
 
@@ -21,41 +23,40 @@ const Home = (): JSX.Element => {
     });
   }, []);
 
+  const swaggerPromise = axios.get("https://www.mingweisamuel.com/lcu-schema/lcu/openapi.json");
+
   useEffect(() => {
-    axios
-      .get("http://www.mingweisamuel.com/lcu-schema/lcu/openapi.json")
-      .then((res) => {
+    if (null == credentials) {
+      console.warn('Credentials are null.');
+      return;
+    }
+    swaggerPromise.then((res: AxiosResponse<any>) => {
+
         const spec = res.data;
 
         spec.servers = [
           {
-            url: `https://127.0.0.1:${credentials?.port}`,
+            url: `https://127.0.0.1:${credentials.port}`,
             description: "default",
           },
         ];
 
         spec.components = {
           securitySchemes: {
-            BasicAuth: {
-              type: "https",
+            [BASIC_AUTH]: {
+              type: "http",
               scheme: "basic",
             },
           },
         };
-
-        // const basicAuth = [
-        //   {
-        //     Authorization: `Basic ${btoa(
-        //       // @ts-ignore
-        //       `${credentials.username}:${credentials.password}`
-        //     )}`,
-        //   },
-        // ];
-        //
-        // spec.security = [basicAuth];
+        spec.security = [
+          {
+            [BASIC_AUTH]: [],
+          }
+        ];
 
         try {
-          Swagger({
+          const swagger = Swagger({
             dom_id: "#swagger",
             spec,
             operationsSorter: "alpha",
@@ -65,61 +66,14 @@ const Home = (): JSX.Element => {
             displayRequestDuration: true,
             filter: "",
             deepLinking: false, // @ts-ignore
-            request: {
-              curlOptions: [
-                "--insecure",
-                `-H "Authorization: ${btoa(
-                  // @ts-ignore
-                  `${credentials.username}:${credentials.password}`
-                )}"`,
-              ],
-            },
+            'request.curlOptions': [ "--insecure" ], // TODO: doesn't seem to show up.
           });
+          swagger.preauthorizeBasic(BASIC_AUTH, credentials.username, credentials.password);
         } catch (e) {
           console.log("not ready to swagify");
           console.log(e);
         }
       });
-  }, [credentials]);
-
-  useEffect(() => {
-    window.fetch = (inf, req) => {
-      if (!credentials) {
-        return;
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { url, method } = req;
-      // eslint-disable-next-line consistent-return
-      return axios
-        .request({
-          method: method || "get",
-          url,
-          httpsAgent: reAgent,
-          withCredentials: true,
-          responseType: "text",
-          transformResponse: (res) => res,
-          headers: {
-            Authorization: `Basic ${btoa(
-              // @ts-ignore
-              `${credentials.username}:${credentials.password}`
-            )}`,
-          },
-        })
-        .then((res) => {
-          console.log(`typeof res: ${typeof res}`);
-          return new Response(res.data ? res.data : "", {
-            headers: res.headers,
-            status: res.status ? res.status : 200,
-            statusText: res.statusText ? res.statusText : "k",
-          });
-        })
-        .catch((error) => {
-          console.error(error);
-          console.error(`Credentials: ${JSON.stringify(credentials)}`);
-          throw new Error(error);
-        });
-    };
   }, [credentials]);
 
   return (
