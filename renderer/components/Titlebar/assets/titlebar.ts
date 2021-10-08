@@ -11,8 +11,8 @@ const TitlebarStyled = styled.div`
     margin: 0.3rem;
     -webkit-app-region: no-drag;
     button {
-      width: 3vh;
-      height: 100%;
+      width: 1.25rem;
+      height: 1.25rem;
       margin: 0 0.2rem;
       border-radius: 100%;
       -webkit-app-region: no-drag;

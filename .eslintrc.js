@@ -1,3 +1,4 @@
+const {off} = require("./renderer/.next/static/chunks/main");
 module.exports = {
   extends: [
     'airbnb-typescript',
@@ -30,6 +31,11 @@ module.exports = {
     'react/jsx-props-no-spreading': 'off',
     'linebreak-style': 'off',
     'import/no-extraneous-dependencies': 'off',
+    'react/button-has-type': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    "no-console": 'off',
+    'react-hooks/exhaustive-deps': 'off',
+    'jsx-a11y/control-has-associated-label': 'off',
     'prettier/prettier': [
       'error',
       {

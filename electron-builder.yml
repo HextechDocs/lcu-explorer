@@ -1,6 +1,6 @@
-appId: me.hiray.nextron
-productName: Nextron Example app
-copyright: Copyright © 2020 Ray
+appId: dev.hextechdocs.lcuexplorer
+productName: LCU Explorer
+copyright: Copyright © 2021 HextechDocs
 directories:
   output: dist
   buildResources: resources

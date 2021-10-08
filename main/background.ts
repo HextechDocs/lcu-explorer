@@ -19,15 +19,20 @@ if (isProd) {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
-app.on('certificate-error', (event, _webContents, _url, _error, certificate, callback) => {
-  if ('sha256/TQ1pFVrt3Msu+IVgubjrrixp75XCuDFovDbcTcqTJjw=' === certificate.fingerprint) {
-    event.preventDefault();
-    callback(true);
+app.on(
+  "certificate-error",
+  (event, _webContents, _url, _error, certificate, callback) => {
+    if (
+      certificate.fingerprint ===
+      "sha256/TQ1pFVrt3Msu+IVgubjrrixp75XCuDFovDbcTcqTJjw="
+    ) {
+      event.preventDefault();
+      callback(true);
+    } else {
+      callback(false);
+    }
   }
-  else {
-    callback(false);
-  }
-});
+);
 
 (async () => {
   connector.start();
@@ -61,12 +66,21 @@ app.on('certificate-error', (event, _webContents, _url, _error, certificate, cal
     },
   });
 
+  ipc.on("process:min", () => {
+    mainWindow.minimize();
+  });
+
+  ipc.on("process:minmax", () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+    mainWindow.maximizable ? mainWindow.maximize() : mainWindow.unmaximize();
+  });
+
   if (isProd) {
     await mainWindow.loadURL("app://./home.html");
   } else {
     const port = process.argv[2];
     await mainWindow.loadURL(`http://localhost:${port}/home`);
-    mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools({ mode: "detach" });
   }
 })();
 
@@ -89,4 +103,8 @@ ipc.on("fe-ready", (event, args) => {
     console.log(`PASSING CREDENTIALS ${JSON.stringify(credentials)}`);
     event.reply("credentialspass", credentials);
   }
+});
+
+ipc.on("process:close", () => {
+  process.exit(0);
 });
