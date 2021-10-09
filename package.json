@@ -16,8 +16,8 @@
     },
     {
       "name": "Mingwei Samuel",
-      "url": "",
-      "email": ""
+      "url": "https://www.mingweisamuel.com",
+      "email": "mingwei.samuel@gmail.com"
     }
   ],
   "main": "app/background.js",
@@ -25,8 +25,8 @@
     "dev": "nextron",
     "build": "nextron build",
     "postinstall": "electron-builder install-app-deps",
-    "format": "prettier --write src/**/*.ts{,x}",
-    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}",
+    "format": "prettier --write {main,renderer}/**/*.ts{,x}",
+    "lint": "tsc --noEmit && eslint {main,renderer}/**/*.ts{,x}",
     "update:deps": "npx npm-check-updates -u && yarn",
     "create:component": "npx hygen component new",
     "create:layout": "npx hygen layout new",
