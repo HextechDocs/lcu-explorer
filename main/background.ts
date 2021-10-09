@@ -56,7 +56,7 @@ app.on(
     height: 720,
     minWidth: 1280,
     minHeight: 720,
-    title: "Treeline Explorer",
+    title: "LCU Explorer",
     frame: false,
     backgroundColor: backgroundColor(),
     webPreferences: {
