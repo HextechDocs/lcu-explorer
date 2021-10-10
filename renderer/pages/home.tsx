@@ -67,7 +67,10 @@ const Home = (): JSX.Element => {
       displayRequestDuration: true,
       filter: "",
       deepLinking: false, // @ts-ignore
-      "request.curlOptions": ["--insecure"], // TODO: doesn't seem to show up.
+      requestInterceptor: (request: any) => {
+        request.curlOptions = ["--insecure"];
+        return request;
+      },
       plugins: [
         (system) => ({
           statePlugins: {
