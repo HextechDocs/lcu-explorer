@@ -4,29 +4,31 @@
 
 A replacement for rift explorer which doesn't need restarting from the original contributors
 
-## How to run
-```
-Make sure league of legends is open first then open lcu explorer.
-```
+## Usage
 
-## Build
+- Download the [latest release from GitHub](https://github.com/HextechDocs/lcu-explorer/releases/latest) (exe installer or unpacked standalone zip).
+- LCU Explorer should start after installing, or start manually after unzipping.
+- If the LoL client is not already running, start it now.
+  - Endpoints will show immediately after launching, but "try it out" is hidden unless the client is running.
 
+## Development
+
+### Install dependencies
 ```
 yarn
 ```
+then...
 
-then 
+### Run in dev mode
+```
+yarn dev
+```
+
+### Build
 ```
 yarn build
 ```
 
-## Run in dev mode
-```
-yarn 
-```
-then
-```
-yarn dev
-```
 ## Credits
-### **Massive thank you to [Mingwei Samuel](https://github.com/MingweiSamuel)** for his work on this app and the backend driving it
+
+**Massive thank you to [Mingwei Samuel](https://github.com/MingweiSamuel)** for his work on this app and the backend driving it.
