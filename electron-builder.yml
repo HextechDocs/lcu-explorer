@@ -1,6 +1,6 @@
 appId: dev.hextechdocs.lcuexplorer
 productName: LCU Explorer
-copyright: Copyright © 2021 HextechDocs
+copyright: Copyright © 2022 HextechDocs
 directories:
   output: dist
   buildResources: resources

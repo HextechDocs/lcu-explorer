@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import { ipcRenderer } from "electron";
 import Swagger from "swagger-ui";
 import axios, { AxiosResponse } from "axios";
+import { isEmpty } from "lodash";
 
 import Titlebar from "@components/Titlebar";
 
 type Credentials = {
-  address: string;
-  port: number;
-  username: string;
-  password: string;
-  protocol: string;
+  address?: string;
+  port?: number;
+  username?: string;
+  password?: string;
+  protocol?: string;
 };
 type SwaggerUIPlugged = Swagger & {
   updateSpec: (specUpdates: any) => void;
@@ -18,13 +19,18 @@ type SwaggerUIPlugged = Swagger & {
 
 const BASIC_AUTH = "BasicAuth";
 
-const Home = (): JSX.Element => {
-  const [swagger, SetSwagger] = useState<SwaggerUIPlugged>();
-  const [credentials, SetCredentials] = useState<Credentials>();
-  const [spec, SetSpec] = useState<any>();
+const Home: React.FC = () => {
+  const [swagger, SetSwagger] = useState<any>({});
+  const [credentials, SetCredentials] = useState<Credentials>({});
+  const [spec, SetSpec] = useState<any>({});
 
   // Get spec.
   useEffect(() => {
+    if (!isEmpty(spec)) {
+      console.log("spec is not empty returning");
+      return;
+    }
+    console.warn("spec is empty fetching");
     axios
       .get("https://www.mingweisamuel.com/lcu-schema/lcu/openapi.json")
       .then((res: AxiosResponse<any>) => SetSpec(res.data));
@@ -34,7 +40,9 @@ const Home = (): JSX.Element => {
   useEffect(() => {
     ipcRenderer.on("credentialspass", (_event, newCredentials) => {
       console.log(`FE received credentials: ${JSON.stringify(newCredentials)}`);
-      SetCredentials(newCredentials);
+      if (isEmpty(credentials)) {
+        SetCredentials(newCredentials);
+      }
     });
     ipcRenderer.send("fe-ready");
   }, []);
@@ -42,6 +50,7 @@ const Home = (): JSX.Element => {
   // Setup Swagger UI.
   useEffect(() => {
     const swaggerInst = Swagger({
+      syntaxHighlight: false,
       dom_id: "#swagger",
       spec: {
         openapi: "3.0.0",
@@ -63,8 +72,13 @@ const Home = (): JSX.Element => {
       operationsSorter: "alpha",
       tagsSorter: "alpha",
       docExpansion: "none",
-      defaultModelExpandDepth: 1,
+      defaultModelExpandDepth: 10,
+      maxDisplayedTags: 100,
+      tryItOutEnabled: true,
       displayRequestDuration: true,
+      pluginsOptions: {
+        pluginLoadType: "chain",
+      },
       filter: "",
       deepLinking: false, // @ts-ignore
       requestInterceptor: (request: any) => {
@@ -77,8 +91,9 @@ const Home = (): JSX.Element => {
             spec: {
               wrapSelectors: {
                 allowTryItOutFor: () => () => {
-                  const jsonSpec = system.getState().toJSON().spec.json;
-                  return jsonSpec.servers.length > 0;
+                  // const jsonSpec = system.getState().toJSON().spec.json;
+                  console.log("rerendering");
+                  return true;
                 },
               },
             },
@@ -97,7 +112,12 @@ const Home = (): JSX.Element => {
       ],
       onComplete: () => {
         console.log("Swagger UI loading complete.");
-        SetSwagger(swaggerInst);
+        if (isEmpty(swagger)) {
+          console.log("swagger is empty applying instance");
+          SetSwagger(swaggerInst);
+        } else {
+          console.log("swagger instance is present");
+        }
       },
     }) as SwaggerUIPlugged;
   }, []);
@@ -116,6 +136,11 @@ const Home = (): JSX.Element => {
 
     // Update credentials/port from connector.
     if (credentials != null) {
+      if (isEmpty(swagger)) {
+        console.log("swager is empty and credentials arent null");
+        return;
+      }
+      console.log("updating spec...");
       swagger.updateSpec({
         servers: [
           {
@@ -130,6 +155,10 @@ const Home = (): JSX.Element => {
         credentials.password
       );
     } else {
+      if (isEmpty(swagger)) {
+        return;
+      }
+      console.log("updating spec");
       swagger.updateSpec({
         servers: [],
       });
@@ -137,6 +166,7 @@ const Home = (): JSX.Element => {
 
     // Update OpenAPI spec lcu-schema.
     if (spec != null) {
+      console.log("updating spec");
       swagger.updateSpec(spec);
     }
   }, [swagger, credentials, spec]);
