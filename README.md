@@ -1,3 +1,6 @@
+# ⚠️ Deprecated in favour of:
+[Needlework.Net](https://github.com/BlossomiShymae/Needlework.Net)
+
 # LCU Explorer
 
 ---
